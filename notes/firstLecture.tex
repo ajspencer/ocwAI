@@ -1,0 +1,77 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage[pdftex]{graphicx}
+\usepackage[ampersand]{easylist}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usetikzlibrary{intersections}
+
+\usepackage{fancyhdr}
+
+%Listings stuff
+\usepackage{listings}
+\usepackage{lstautogobble}
+\usepackage{color}
+
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\lstset{
+basicstyle={\small\ttfamily},
+tabsize=3,
+numbers=left,
+numbersep=5pt,
+numberstyle=\tiny\color{gray},
+stepnumber=2,
+breaklines=true,
+boxpos=t
+}
+
+%Format stuff
+\pagestyle{fancy}
+\headheight 35pt
+
+%Header info
+\chead{\Large \textbf{AI first lecture}}
+\lhead{}
+\rhead{}
+
+\begin{document}
+\section{Goal trees}
+Solving the integral $\int \frac{-5x^4}{(1-x^2)^{5/a}} dx $ reduce the problem into one of smaller forms that we can solve with memorization. \\
+We use \textbf{Problem reduction} to solve problems such as this, with the following transformations:
+
+\begin{easylist}[itemize]
+& Safe transformations
+&& $\int -f(x) = -\int f(x)$
+&& Pull out the constants
+&& Sum of the integrals is the integral of the sum
+&& If the degree of numerator is greater than degree of denominator, divide it out
+& Heuristic transformations
+&& $f(sin(x),cos(x), tan(x), cot(x), sec(x), cos(x)) = g(cos(x), sin(x)) = g_2(tan(x), cosec(x)) = g_3(cotan(x), sec(x))$ 
+&& $ \int f(tan(x)) dx = \int \frac{f(y)}{1 + y^2} dy $
+&& $1-x^2, x = sin(y), 1+x^2 = x * tan(y)$ 
+\end{easylist} \hfill \break
+
+And node: what happens when we split a problem into multiple problems that we must solve. \\
+Or node: can be solved one of two different ways, we don't care which is which \\
+These nodes are in a tree called a problem reduction tree, goal tree, and or tree \\
+To decide between things to integrate in an or: measure the depth of funcitonal composition \\
+Procedure for solving:
+
+\begin{easylist}[enumerate]
+& apply all safe tranformations
+& look in the table, see if we are done
+& find a problem using depth of functional composition look at every leaf, apply heurisitc transform
+& Go back to step 1
+\end{easylist} \hfill \break
+
+Vital knowledge:
+\begin{easylist}[enumerate]
+& What kind
+& How represented
+& How much
+& How used
+& What exactly 
+\end{easylist}
+
+\end{document}
