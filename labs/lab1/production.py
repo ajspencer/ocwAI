@@ -56,7 +56,7 @@ def instantiate(template, values_dict):
     if (isinstance(template, AND) or isinstance(template, OR) or
         isinstance(template, NOT)):
 
-        return template.__class__(*[populate(x, values_dict) 
+        return template.__class__(*[populate(x, values_dict)
                                     for x in template])
     elif isinstance(template, basestring):
         return AIStringToPyTemplate(template) % values_dict
@@ -77,7 +77,7 @@ def match(template, AIStr):
     AIStr, or None if no such set exists.
     """
     try:
-        return re.match( AIStringToRegex(template), 
+        return re.match( AIStringToRegex(template),
                          AIStr ).groupdict()
     except AttributeError: # The re.match() expression probably
                            # just returned None
@@ -98,7 +98,7 @@ def variables(exp):
     except AttributeError: # The re.match() expression probably
                            # just returned None
         return None
-        
+
 class IF(object):
     """
     A conditional rule.
@@ -117,12 +117,12 @@ class IF(object):
     that will be deleted when the rule fires. Again, variables
     can be filled in from the antecedent.
     """
-    def __init__(self, conditional, action = None, 
+    def __init__(self, conditional, action = None,
                  delete_clause = ()):
         # Deal with an edge case imposed by type_encode()
         if type(conditional) == list and action == None:
             return apply(self.__init__, conditional)
-        
+
         # Allow 'action' to be either a single string or an
         # iterable list of strings
         if isinstance(action, basestring):
@@ -166,13 +166,13 @@ class IF(object):
                             return tuple(sorted(new_rules))
                 except KeyError:
                     pass
-                    
+
         return tuple(sorted(new_rules)) # Uniquify and sort the
                                         # output list
 
 
     def __str__(self):
-        return "IF(%s, %s)" % (str(self._conditional), 
+        return "IF(%s, %s)" % (str(self._conditional),
                                str(self._action))
 
     def antecedent(self):
@@ -197,7 +197,7 @@ class RuleExpression(list):
             and not isinstance(args[0], RuleExpression)):
             args = args[0]
         list.__init__(self, args)
-    
+
     def conditions(self):
         """
         Return the conditions contained by this
@@ -207,12 +207,12 @@ class RuleExpression(list):
         return list(self)
 
     def __str__(self):
-        return '%s(%s)' % (self.__class__.__name__, 
+        return '%s(%s)' % (self.__class__.__name__,
                            ', '.join([repr(x) for x in self]) )
 
     __repr__ = __str__
-        
-    def test_term_matches(self, condition, rules, 
+
+    def test_term_matches(self, condition, rules,
                           context_so_far = None):
         """
         Given an expression which might be just a string, check
@@ -228,7 +228,7 @@ class RuleExpression(list):
 
         # Hm; no convenient test function here
         else:
-            return self.basecase_bindings(condition, 
+            return self.basecase_bindings(condition,
                                           rules, context_so_far)
 
     def basecase_bindings(self, condition, rules, context_so_far):
@@ -253,7 +253,7 @@ class RuleExpression(list):
                 condition_vars |= condition.get_condition_vars()
             else:
                 condition_vars |= AIStringVars(condition)
-                
+
         return condition_vars
 
     def test_matches(self, rules):
@@ -269,11 +269,11 @@ class AND(RuleExpression):
     """A conjunction of patterns, all of which must match."""
     class FailMatchException(Exception):
         pass
-    
+
     def test_matches(self, rules, context_so_far = {}):
         return self._test_matches_iter(rules, list(self))
 
-    def _test_matches_iter(self, rules, conditions = None, 
+    def _test_matches_iter(self, rules, conditions = None,
                            cumulative_dict = None):
         """
         Recursively generate all possible matches.
@@ -291,13 +291,13 @@ class AND(RuleExpression):
         if len(conditions) == 0:
             yield cumulative_dict
             return
-            
+
         # Recursive Case
         condition = conditions[0]
         for bindings in self.test_term_matches(condition, rules,
                                                cumulative_dict):
             bindings = NoClobberDict(bindings)
-            
+
             try:
                 bindings.update(cumulative_dict)
                 for bindings2 in self._test_matches_iter(rules,
@@ -306,7 +306,7 @@ class AND(RuleExpression):
             except ClobberedDictKey:
                 pass
 
-            
+
 class OR(RuleExpression):
     """A disjunction of patterns, one of which must match."""
     def test_matches(self, rules, context_so_far = {}):
