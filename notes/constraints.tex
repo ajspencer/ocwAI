@@ -1,0 +1,129 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage[pdftex]{graphicx}
+\usepackage[ampersand]{easylist}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usetikzlibrary{intersections}
+
+\usepackage{fancyhdr}
+
+%Listings stuff
+\usepackage{listings}
+\usepackage{lstautogobble}
+\usepackage{color}
+
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\lstset{
+basicstyle={\small\ttfamily},
+tabsize=3,
+numbers=left,
+numbersep=5pt,
+numberstyle=\tiny\color{gray},
+stepnumber=2,
+breaklines=true,
+boxpos=t
+}
+
+%Format stuff
+\pagestyle{fancy}
+\headheight 35pt
+
+%Header info
+\chead{\Large \textbf{Constraints}}
+\lhead{}
+\rhead{}
+
+\begin{document}
+\section{interpreting line drawing}
+The simplified model:
+\begin{easylist}[enumerate]
+& World is presented in general position, can't change type of verticies by moving view
+& a world that is trihedral, all verticies are connected by three faces
+& Three kinds of lines: concave (-), convex(-), boundary (->), boundary lines hide one face and concave, convex show both faces.
+\end{easylist} \hfill \break
+
+Boundary lines have arrows based on which way you'd have to walk along it to see the stuff on the right. \\
+In this model, there are 18 ways to arrange a label around a junciton. \\
+Ls, forks, Ts and arrows are the type of functions we can have, each with three verticies coming together. \\
+
+In the new model, we are going to add:
+\begin{easylist}[enumerate]
+& cracks
+& shadows
+& Nontrihedral verticies
+& Light
+\end{easylist} \hfill \break
+
+This leads to from 4 to 50+ labels and from 18 to thousands of junctions. \\
+To correctly label an object: label each of the verticies, and move backwards and see which of them conflict with our correct label. \\
+\section{Search and domain reduction}
+Graph coloring: problem, unconstrained local constraints cause problems downstream. \\
+Solution: look at local constraints, make sure they can't cause problems downstream. \\
+Vocab: \\
+\begin{easylist}[enumerate]
+& variable v: something that cn have an assignment
+& value x: something that can be an assignment
+& domain d: bag of values 
+& constraint c: limit on variable values
+\end{easylist} \hfill \break
+
+\textbf{procedure:}\\
+For each depth first search assignment: \\
+\tab for each variable  $v_i$ considered \\
+\tab \tab for each $x_i$ in $D_i$ \\
+\tab \tab \tab for each constraint $c(x_i, x_j)$ where $x_j \in D_j$ \\
+\tab \tab \tab \tab if $\exists! x_j \ni c(x_i, x_j)$ satisfied remove $x_i$ from $d_i$ \\ 
+\tab \tab \tab \tab if $d_i = \emptyset$ backup\\
+\hfill \break
+Things we can consider in step 2 \\
+\begin{easylist}[itemize]
+& nothing, doesn't even produce a right answer
+& assignment, takes waayy too long
+& check that neihbors are valid along with assignment: 9139 dead ends but correct answer in a minute
+& Through D with V reduced to one value: less than a thousand constraints checked, fast 
+& propogate checking through variables with reduced domains: 0 seconds, 0 deadends 
+& everything, once we color the first state check to see if all other 48 can be colored
+\end{easylist} \hfill \break
+In general, we want to put the most contrainted problems first. \\
+\section{visual object recognition}
+For years, vision experts thought vision depended on the following levels: \\
+\begin{easylist}[enumerate]
+& The lowest description level, brightness values are conveyed explicitily in the image
+& The brighness changes in the image are described explicitly in the \textbf{primal sketch}
+& The surfaces that are implicit in the primal sketch are described explicitly in the \textbf{two-and-one-half-dimension sketch}
+& The volumes that are implciit in the two and one half dimension sketch are described expliitly in the \textbf{volume description}
+\end{easylist} \hfill \break
+No one could make this model work, and we determined we can do everything at the primal sketch level\\
+It was shown that to identify a polyhedra you only need 3 images each of 4 verticies and information of the polyhedra's size. \\
+In the \textbf{identification model} problem, we want to match each unkown with a polyhedra. The model contains several images, which display feature points, of each polyhedra. \\
+In the simple model, assume that we can only rotate images about the y axsis. The new values in rotation can be found by the equations: \\
+\begin{align}
+x_\theta &= x cos \theta - z sin \theta\\
+y_\theta &= y, \\
+z_\theta &= x sin \theta + z cos \theta \\
+\end{align} \hfill \break
+
+In the problem of predicting where a third image will be based on two previous x values, we used: 
+\begin{align}
+x_1 &= x cos \theta_{I_{1}}- z sin \theta_{I_1}
+x_2 &= x cos \theta_{I_{2}}- z sin \theta_{I_2}
+x_0 &= x cos \theta_{I_{0}}- z sin \theta_{I_0}
+\end{align} \hfill \break
+We seee that $X_{I_0}$ is a linear combination of the other two Xs. \\
+Expanding to the general case, x is a linear combination of 3 other x values + a constant. Math is too complicated to prove \\
+The general procedure is as follow:
+\begin{easylist}[enumerate]
+& Unitil a satisfactory match is made or there are no more models in the model library
+&& Find four corresponding points in the obsereved image and in a model's three library images
+&& Use he corresponding points to determine the coefficents a and b used to predict the x and y coordinate values of other image points. \\
+&& Determine wether a satisfactory match is made by comparing the predicted x and y coordinate values with those actually found in the observed image.
+& If a satisfactory match occurs, announce the identity of the unknown, otherwise announce failure. 
+\end{easylist} \hfill \break
+
+We can use \textbf{correlation} to help identify things. The simple idea is that we take a test object and run it across the picture and see if we can get a match. \\
+This is too general, so we work on intermediate features: take an intermediate feature and run it across and see if we can get a match. \\
+
+\end{document}

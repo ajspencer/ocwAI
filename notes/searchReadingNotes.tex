@@ -1,0 +1,103 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage[retainorgcmds]{IEEEtrantools}
+\usepackage[pdftex]{graphicx}
+\usepackage[ampersand]{easylist}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usetikzlibrary{intersections}
+
+\usepackage{fancyhdr}
+
+%Listings stuff
+\usepackage{listings}
+\usepackage{lstautogobble}
+\usepackage{color}
+
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\lstset{
+basicstyle={\small\ttfamily},
+tabsize=3,
+numbers=left,
+numbersep=5pt,
+numberstyle=\tiny\color{gray},
+stepnumber=2,
+breaklines=true,
+boxpos=t
+}
+
+%Format stuff
+\pagestyle{fancy}
+\headheight 35pt
+
+%Header info
+\chead{\Large \textbf{Search}}
+\lhead{}
+\rhead{}
+
+\begin{document}
+\section{Nets and search}
+\subsection{introduction}
+When finding a path, you can create a \textbf{search tree} that denotes all possible paths. \\
+A search tree is a semantic tree which consists of:
+\begin{easylist}[enumerate]
+& Nodes that denote paths
+& Branches which connect paths to one step-path extensions
+& Writers can connect a path in the tree to a description of the path
+& Readers can produce a path's description based on the tree
+\end{easylist}
+
+Determining the children of a node is called \textbf{expanding} the node. Nodes are \textbf{closed} if they're not expanded and \textbf{open} if they are. \\
+\subsection{algorithms}
+\textbf{Hill Climbing:} a modification of deapth first search where we order choices according to a heuristic, such as straight line distance, measure of how far we are from the goal. We order the new elements we are inserting into our queue by this heuristic \\
+Problems with hill climbing: 
+\begin{easylist}[enumerate]
+& Could get stuck in local optimum
+& The search space could be flat with a dramatic peak in the middle
+& The gradient goes against the directions you're stepping, and all steps seem to take you down. 
+\end{easylist} \hfill \break
+\textbf{beam search / best first search:} at each step in breadth-first search, only expand the w best nodes. Best first search, the best node no matter where it's from is selected.
+\subsection{optimal search}
+\textbf{Branch-and-bound search}: keep track of all partial paths contending for future consideration. Extend the shortest one, consider the new paths and repeat with the shortest one. \\
+We can add in a guess of the remaining distance to help us. Over estimates can cause us to miss the optimal path, but underestimates never can. Straight line distance will always be an underestiamte \\
+To modify our search, we just instead order the priority queue we keep track of maths with by the sum of the path length and estimate of remaining cost. \\
+We can further modify it by adding the condition: if two or more paths reach a common node, delete all paths except the one that reaches the common node with the minimum cost. \\
+\textbf{A*} is just branch-and-bound with a distance heuristic and path compression. \\
+\subsection{adversarial search}
+We can represent games, such as chess, as a decision tree of moves where opponents get to take turns moving. \\
+\textbf{static evaluation:} the process of determining the quality of a static board. \\
+For our purposes, assume one player is trying to maximize their score and another player is trying to minimize their score. Negative scores are good for the minimum player and maximum scores are good for the maximum player. \\
+In the \textbf{minimax} procedure: 
+\begin{easylist}[enumerate]
+& If the limit of the search has been reached, compute the static value relative to current player and return the result \\
+& otherwise, if we are at a minimizing level, use minimax on the children of the current level and report the minimum. \\
+& else if we are at a maximizing level, use minimax on the children of the current level and report the maximum. \\
+\end{easylist} \hfill \break
+If we are testing a minimizing level, there is no point in investigating children where we know the maximizor can get a higher score than if we picked another path. \\
+This procedure is called \textbf{alpha-beta} once we know we can force a particular score to occur, there's no point in investigating other worse scores. \\
+On a minimizing level, keep track of the minimum score among the children, if a child is found to have a direct child with a higher score, we don't need to investigate tha node anymore. \\
+Alpha-beta proceudre:
+\begin{easylist}[itemize]
+& If the level is the top layer, let alpha be $\infty$ and beta be $-\infty$
+& If the search limit has been reached, compute the static vlaue of the current position relative to the appropriate player and return the result
+& If the level is a minimizing level, 
+&& until all children are examined with alha=beta or until alpha is equal to or greater than beta
+&&& Use the alpha-beta procedure with the current alpha and beta values on a child and record the value reported
+&&& compare the value reported with the beta value, and if the reported value is smaller than the betra value update beta
+&& report beta
+& If the level is a maximizing level, 
+&& until all children are examined with alha=beta or until alpha is equal to or greater than beta
+&&& Use the alpha-beta procedure with the current alpha and beta values on a child and record the value reported
+&&& compare the value reported with the alpha value, and if the reported value is larger than the alpha value update alpha
+&& report alpha
+\end{easylist} \hfill \break
+
+To improve the algorithm, we can use progressive deppening and continue doing our alpha,beta to the n-1 level and expanding. \\
+For chess, we add in the \textbf{singular-extension heuristic} that states that as long as one move stands out from the rest for the opponent we need to keep going, as to avoid a capture. \\
+
+
+
+
+
+
+\end{document}
